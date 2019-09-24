@@ -2,6 +2,8 @@ var password;
 var iterations, salt, iv;
 var payload;
 
+var decrypted_content;
+
 let int_length = 4;
 let salt_length = 12;
 let iv_length = 12;
@@ -58,11 +60,39 @@ async function decrypt() {
         console.error(err);
     });
 
-    json_text = new TextDecoder("utf-8").decode(new Uint8Array(decrypted));
+    decrypted_content = new TextDecoder("utf-8").decode(new Uint8Array(decrypted));
 
-    content = document.getElementById("content");
-    content.innerText = json_text;
+    document.getElementById("content").innerText = decrypted_content;
+    document.getElementById("btnDownload").disabled = false;
+    document.getElementById("btnShow").disabled = false;
 };
+
+function toggleContent() {
+    let contentDiv = document.getElementById("content");
+
+    if (contentDiv.style.display === "none") {
+        contentDiv.style.display = "block";
+    } else if (contentDiv.style.display === "block") {
+        contentDiv.style.display = "none";
+    }
+}
+
+
+function downloadPlain() {
+    data_uri = "data:text/json;charset=utf-8," + encodeURIComponent(decrypted_content);
+
+    var element = document.createElement("a");
+    element.setAttribute("href", data_uri);
+    element.setAttribute("download", "andOTP_Backup.json");
+
+    element.style.display = "none";
+
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+}
 
 function getKeyMaterial() {
     let enc = new TextEncoder();
@@ -78,8 +108,11 @@ function getKeyMaterial() {
 
 function loadHandler() {
     document.getElementById("content").innerText = "";
+    document.getElementById("content").style.display = "none";
     document.getElementById("iptFile").value = "";
     document.getElementById("iptPassword").disabled = true;
     document.getElementById("btnDecrypt").disabled = true;
+    document.getElementById("btnDownload").disabled = true;
+    document.getElementById("btnShow").disabled = true;
 }
 
