@@ -48,6 +48,8 @@ async function decrypt() {
         [ "decrypt" ]
     );
 
+    var decryptSuccess = true;
+
     let decrypted = await window.crypto.subtle.decrypt(
         {
             name: "AES-GCM",
@@ -58,13 +60,24 @@ async function decrypt() {
     )
     .catch(function(err) {
         console.error(err);
-    });
+        decryptSuccess = false;
+    })
 
-    decrypted_content = new TextDecoder("utf-8").decode(new Uint8Array(decrypted));
+    if (decryptSuccess) {
+        decrypted_content = new TextDecoder("utf-8").decode(new Uint8Array(decrypted));
 
-    document.getElementById("content").innerText = decrypted_content;
-    document.getElementById("btnDownload").disabled = false;
-    document.getElementById("btnShow").disabled = false;
+        document.getElementById("content").innerText = decrypted_content;
+        document.getElementById("btnDownload").disabled = false;
+        document.getElementById("btnShow").disabled = false;
+    } else {
+        decrypted_content = ""
+
+        document.getElementById("content").innerText = ""
+        document.getElementById("btnDownload").disabled = true;
+        document.getElementById("btnShow").disabled = true;
+
+        window.alert("Decryption failed, please check your password!");
+    }
 };
 
 function toggleContent() {
